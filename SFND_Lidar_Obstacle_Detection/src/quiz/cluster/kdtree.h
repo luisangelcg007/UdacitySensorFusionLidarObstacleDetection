@@ -77,10 +77,41 @@ struct KdTree
 		}*/
 	}
 
+	void searchHelperRecursive(std::vector<float> targetPoint, Node* node, int depth, float distanceTol, std::vector<int>& ids)
+    {
+    	if (node != NULL)
+        {
+        	if (
+				   (node->point[0] >= (targetPoint[0]-distanceTol) && (node->point[0] <= (targetPoint[0]+distanceTol)))
+                && (node->point[1] >= (targetPoint[1]-distanceTol) && (node->point[1] <= (targetPoint[1]+distanceTol))) 
+				//&& (node->point[2] >= (targetPoint[2]-distanceTol) && (node->point[2] <= (targetPoint[2]+distanceTol)))
+			   )
+           	{
+				float xDIstanceElement = (node->point[0]-targetPoint[0])*(node->point[0]-targetPoint[0]);
+				float yDIstanceElement = (node->point[1]-targetPoint[1])*(node->point[1]-targetPoint[1]);
+				float zDIstanceElement = 0;//(node->point[2]-targetPoint[2])*(node->point[2]-targetPoint[2]);
+
+              	float distance = sqrt(xDIstanceElement + yDIstanceElement + zDIstanceElement);
+              
+              	if (distance <= distanceTol)
+                	ids.push_back(node->id);
+            }
+          
+			uint xIsZeroYisOne = depth % 2;
+
+          	if ((targetPoint[xIsZeroYisOne]-distanceTol)<node->point[xIsZeroYisOne])
+            	searchHelperRecursive(targetPoint, node->left, depth+1, distanceTol, ids);
+
+          	if ((targetPoint[xIsZeroYisOne]+distanceTol)>node->point[xIsZeroYisOne])
+            	searchHelperRecursive(targetPoint, node->right, depth+1, distanceTol, ids);
+        }
+    }
+
 	// return a list of point ids in the tree that are within distance of target
 	std::vector<int> search(std::vector<float> target, float distanceTol)
 	{
 		std::vector<int> ids;
+		searchHelperRecursive(target, root, 0, distanceTol, ids);
 		return ids;
 	}
 	
