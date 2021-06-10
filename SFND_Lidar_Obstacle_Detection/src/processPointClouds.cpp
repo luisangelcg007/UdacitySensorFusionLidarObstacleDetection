@@ -23,16 +23,12 @@ void ProcessPointClouds<PointT>::numPoints(typename pcl::PointCloud<PointT>::Ptr
 template<typename PointT>
 typename pcl::PointCloud<PointT>::Ptr ProcessPointClouds<PointT>::FilterCloud(typename pcl::PointCloud<PointT>::Ptr cloud, float filterRes, Eigen::Vector4f minPoint, Eigen::Vector4f maxPoint)
 {
-
     // Time segmentation process
     auto startTime = std::chrono::steady_clock::now();
 
-    // TODO:: Fill in the function to do voxel grid point reduction and region based filtering
-    
-    typename pcl::PointCloud<PointT>::Ptr cloudFiltered(new pcl::PointCloud<PointT>);
-
-    //VooxelGrid filter is created 
-    pcl::VoxelGrid<PointT> vg;  
+    pcl::VoxelGrid<PointT> vg;
+  	typename pcl::PointCloud<PointT>::Ptr cloudFiltered(new pcl::PointCloud<PointT>);
+  
   	vg.setInputCloud(cloud);
   	vg.setLeafSize(filterRes, filterRes, filterRes);
   	vg.filter(*cloudFiltered);
@@ -62,13 +58,13 @@ typename pcl::PointCloud<PointT>::Ptr ProcessPointClouds<PointT>::FilterCloud(ty
   	extract.setIndices(inliers);
   	extract.setNegative(true);
   	extract.filter(*cloudRegion);
-
-
+  
     auto endTime = std::chrono::steady_clock::now();
     auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
     std::cout << "filtering took " << elapsedTime.count() << " milliseconds" << std::endl;
 
     return cloudRegion;
+    
 }
 
 
