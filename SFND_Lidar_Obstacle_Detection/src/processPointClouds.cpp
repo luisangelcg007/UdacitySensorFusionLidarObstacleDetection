@@ -228,3 +228,99 @@ std::vector<boost::filesystem::path> ProcessPointClouds<PointT>::streamPcd(std::
     return paths;
 
 }
+
+template<typename PointT>
+std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::RansacSegmentation(pcl::PointCloud<PointT>::Ptr cloud, int maxIterations, float distanceTolerance);  
+{
+    std::unordered_set<int> inliersResultSegmentation;
+	pcl::PointCloud<pcl::PointXYZ>::Ptr roadCloud(new pcl::PointCloud<PointT>());
+    pcl::PointCloud<pcl::PointXYZ>::Ptr obstaclesCloud(new pcl::PointCloud<PointT>());
+
+    auto startTime = std::chrono::steady_clock::now();
+    srand(time(NULL));
+	
+	for(int i = 0; i < maxIterations; i++) 
+    {		
+		std::unordered_set<int> inliers;
+		
+		while (inliers.size() < 3) 
+        {
+			int random_point = (static_cast<double>(std::rand()) / RAND_MAX) * cloud->points.size();
+			inliers.insert(random_point);
+		}
+
+		auto iterator = inliers.begin();
+		
+		pcl::PointXYZ p1 = cloud->points[*iterator];
+		float x1 = p1.x;
+		float y1 = p1.y;
+		float z1 = p1.z;
+		++iterator;
+
+		pcl::PointXYZ p2 = cloud->points[*iterator];
+		float x2 = p2.x;
+		float y2 = p2.y;
+		float z2 = p2.z;
+		++iterator;
+		
+		pcl::PointXYZ p3 = cloud->points[*iterator];
+		float x3 = p3.x;
+		float y3 = p3.y;
+		float z3 = p3.z;
+
+		std::tuple<float, float, float> normal
+        (
+            (y2 - y1) * (z3 - z1) - (z2 - z1) * (y3 - y1),
+			(z2 - z1) * (x3 - x1) - (x2 - x1) * (z3 - z1),
+			(x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1)
+        );
+
+		float A = std::get<0>(normal);
+		float B = std::get<1>(normal);
+		float C = std::get<2>(normal);
+		float D = -(A * x1 + B * y1 + C * z1);
+		float E = (A * A) + (B * B) + (C * C);
+
+		// std::cout << "The line's equation is: " << A << "x" << " + " << B << "y" << " + " << C << "\n";
+		
+		for(int i = 0; i < cloud->points.size(); i++)
+        {
+			pcl::PointXYZ p0 = cloud->points[i];
+
+			if (inliers.count(i) > 0)
+            {
+				continue;
+            }
+
+			float shortestDistance = std::fabs(A * p0.x + B * p0.y + C * p0.z + D) / std::sqrt(E);
+			
+			if (shortestDistance <= distanceTolerance) 
+            {
+				inliers.insert(i);
+			}
+		}
+		if (inliers.size() > inliersResultSegmentation.size()) 
+        {
+			inliersResultSegmentation = inliers;
+		}
+		std::cout << "END: Iteration " << i << ", with " << inliers.size() << " inlier points.\n\n";
+	}
+
+	for(int index = 0; index < cloud->points.size(); index++)
+	{
+		pcl::PointXYZ point = cloud->points[index];
+		if(inliersResultSegmentation.count(index))
+        {
+			roadCloud->points.push_back(point);
+        }
+		else
+        {
+			obstaclesCloud->points.push_back(point);
+        }
+	}
+
+    auto endTime = std::chrono::steady_clock::now();
+	auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
+
+    return std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT>::Ptr>(obstaclesCloud, roadCloud);
+}
