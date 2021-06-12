@@ -18,6 +18,7 @@
 #include <ctime>
 #include <chrono>
 #include <unordered_set>
+#include "kdtree.h"
 #include "render/box.h"
 
 template<typename PointT>
@@ -48,5 +49,7 @@ public:
     std::vector<boost::filesystem::path> streamPcd(std::string dataPath);
 
     std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT>::Ptr> RansacSegmentation(typename pcl::PointCloud<PointT>::Ptr cloud, int maxIterations, float distanceTolerance);
+
+    std::vector<typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::kdTreeClustering(typename pcl::PointCloud<PointT>::Ptr cloud, float clusterTolerance, int minSize, int maxSize);
 };
 #endif /* PROCESSPOINTCLOUDS_H_ */
