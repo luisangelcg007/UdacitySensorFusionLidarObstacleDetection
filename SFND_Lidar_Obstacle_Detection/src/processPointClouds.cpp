@@ -230,11 +230,11 @@ std::vector<boost::filesystem::path> ProcessPointClouds<PointT>::streamPcd(std::
 }
 
 template<typename PointT>
-std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::RansacSegmentation(pcl::PointCloud<PointT>::Ptr cloud, int maxIterations, float distanceTolerance);  
+std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::RansacSegmentation(typename pcl::PointCloud<PointT>::Ptr cloud, int maxIterations, float distanceTolerance)
 {
     std::unordered_set<int> inliersResultSegmentation;
-	pcl::PointCloud<pcl::PointXYZ>::Ptr roadCloud(new pcl::PointCloud<PointT>());
-    pcl::PointCloud<pcl::PointXYZ>::Ptr obstaclesCloud(new pcl::PointCloud<PointT>());
+	typename pcl::PointCloud<PointT>::Ptr roadCloud(new pcl::PointCloud<PointT>());
+    typename pcl::PointCloud<PointT>::Ptr obstaclesCloud(new pcl::PointCloud<PointT>());
 
     auto startTime = std::chrono::steady_clock::now();
     srand(time(NULL));
@@ -251,19 +251,19 @@ std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT
 
 		auto iterator = inliers.begin();
 		
-		pcl::PointXYZ p1 = cloud->points[*iterator];
+		pcl::PointXYZI p1 = cloud->points[*iterator];
 		float x1 = p1.x;
 		float y1 = p1.y;
 		float z1 = p1.z;
 		++iterator;
 
-		pcl::PointXYZ p2 = cloud->points[*iterator];
+		pcl::PointXYZI p2 = cloud->points[*iterator];
 		float x2 = p2.x;
 		float y2 = p2.y;
 		float z2 = p2.z;
 		++iterator;
 		
-		pcl::PointXYZ p3 = cloud->points[*iterator];
+		pcl::PointXYZI p3 = cloud->points[*iterator];
 		float x3 = p3.x;
 		float y3 = p3.y;
 		float z3 = p3.z;
@@ -280,12 +280,10 @@ std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT
 		float C = std::get<2>(normal);
 		float D = -(A * x1 + B * y1 + C * z1);
 		float E = (A * A) + (B * B) + (C * C);
-
-		// std::cout << "The line's equation is: " << A << "x" << " + " << B << "y" << " + " << C << "\n";
 		
 		for(int i = 0; i < cloud->points.size(); i++)
         {
-			pcl::PointXYZ p0 = cloud->points[i];
+			pcl::PointXYZI p0 = cloud->points[i];
 
 			if (inliers.count(i) > 0)
             {
@@ -308,7 +306,7 @@ std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT
 
 	for(int index = 0; index < cloud->points.size(); index++)
 	{
-		pcl::PointXYZ point = cloud->points[index];
+		pcl::PointXYZI point = cloud->points[index];
 		if(inliersResultSegmentation.count(index))
         {
 			roadCloud->points.push_back(point);
