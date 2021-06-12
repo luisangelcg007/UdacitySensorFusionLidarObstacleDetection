@@ -1,7 +1,7 @@
 /* \author Aaron Brown */
 // Quiz on implementing kd tree
 
-#include "../../render/render.h"
+//#include "../../render/render.h"
 
 
 // Structure to represent node of kd tree
@@ -33,10 +33,10 @@ struct KdTree
 		} 
 		else
 		{
-			uint xIsZeroYisOne = depth % 2;
+			uint xOrYorZ = depth % 3;
 			
 			/*for KD tree algorithm the first element to compare is x,then y*/
-			if(point[xIsZeroYisOne] < ((*node)->point[xIsZeroYisOne]))
+			if(point[xOrYorZ] < ((*node)->point[xOrYorZ]))
 			{
 				insertHelper(&((*node)->left), depth+1, point, id);
 			}
@@ -53,28 +53,6 @@ struct KdTree
 		// TODO: Fill in this function to insert a new point into the tree
 		// the function should create a new node and place correctly with in the root 
 		insertHelper(&root, 0, point, id);
-		
-		/*if(root==NULL)
-		{
-			root = new Node (point, id);
-		} 
-		else
-		{
-			uint xIsZeroYisOne = root->depth % 2;
-			
-			//for KD tree algorithm the first element to compare is x,then y
-			if(point[xIsZeroYisOne] < (root->point[xIsZeroYisOne]))
-			{
-				root->left = new Node (point, id);
-				
-			}
-			else
-			{
-				root->right = new Node (point, id);
-			}
-			root->depth++;
-			
-		}*/
 	}
 
 	void searchHelperRecursive(std::vector<float> targetPoint, Node* node, int depth, float distanceTol, std::vector<int>& ids)
@@ -84,12 +62,12 @@ struct KdTree
         	if (
 				   (node->point[0] >= (targetPoint[0]-distanceTol) && (node->point[0] <= (targetPoint[0]+distanceTol)))
                 && (node->point[1] >= (targetPoint[1]-distanceTol) && (node->point[1] <= (targetPoint[1]+distanceTol))) 
-				//&& (node->point[2] >= (targetPoint[2]-distanceTol) && (node->point[2] <= (targetPoint[2]+distanceTol)))
+				&& (node->point[2] >= (targetPoint[2]-distanceTol) && (node->point[2] <= (targetPoint[2]+distanceTol)))
 			   )
            	{
 				float xDIstanceElement = (node->point[0]-targetPoint[0])*(node->point[0]-targetPoint[0]);
 				float yDIstanceElement = (node->point[1]-targetPoint[1])*(node->point[1]-targetPoint[1]);
-				float zDIstanceElement = 0;//(node->point[2]-targetPoint[2])*(node->point[2]-targetPoint[2]);
+				float zDIstanceElement = (node->point[2]-targetPoint[2])*(node->point[2]-targetPoint[2]);
 
               	float distance = sqrt(xDIstanceElement + yDIstanceElement + zDIstanceElement);
               
@@ -97,12 +75,12 @@ struct KdTree
                 	ids.push_back(node->id);
             }
           
-			uint xIsZeroYisOne = depth % 2;
+			uint xOrYorZ = depth % 3;
 
-          	if ((targetPoint[xIsZeroYisOne]-distanceTol)<node->point[xIsZeroYisOne])
+          	if ((targetPoint[xOrYorZ]-distanceTol)<node->point[xOrYorZ])
             	searchHelperRecursive(targetPoint, node->left, depth+1, distanceTol, ids);
 
-          	if ((targetPoint[xIsZeroYisOne]+distanceTol)>node->point[xIsZeroYisOne])
+          	if ((targetPoint[xOrYorZ]+distanceTol)>node->point[xOrYorZ])
             	searchHelperRecursive(targetPoint, node->right, depth+1, distanceTol, ids);
         }
     }
