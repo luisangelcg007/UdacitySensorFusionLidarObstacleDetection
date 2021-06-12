@@ -225,6 +225,7 @@ std::vector<boost::filesystem::path> ProcessPointClouds<PointT>::streamPcd(std::
 
 }
 
+/* Code implemented for lidar project*/
 template<typename PointT>
 std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::RansacSegmentation(
     typename pcl::PointCloud<PointT>::Ptr cloud, 
@@ -418,3 +419,4 @@ std::vector<typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::k
 
     return clusters;
 }
+/* Code implemented for lidar project*/

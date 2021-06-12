@@ -48,8 +48,10 @@ public:
 
     std::vector<boost::filesystem::path> streamPcd(std::string dataPath);
 
+    /* Code implemented for lidar project*/
     std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT>::Ptr> RansacSegmentation(typename pcl::PointCloud<PointT>::Ptr cloud, int maxIterations, float distanceTolerance);
 
     std::vector<typename pcl::PointCloud<PointT>::Ptr> kdTreeClustering(typename pcl::PointCloud<PointT>::Ptr cloud, float clusterTolerance, int minSize, int maxSize);
+    /* Code implemented for lidar project*/
 };
 #endif /* PROCESSPOINTCLOUDS_H_ */
