@@ -50,6 +50,6 @@ public:
 
     std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT>::Ptr> RansacSegmentation(typename pcl::PointCloud<PointT>::Ptr cloud, int maxIterations, float distanceTolerance);
 
-    std::vector<typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::kdTreeClustering(typename pcl::PointCloud<PointT>::Ptr cloud, float clusterTolerance, int minSize, int maxSize);
+    std::vector<typename pcl::PointCloud<PointT>::Ptr> kdTreeClustering(typename pcl::PointCloud<PointT>::Ptr cloud, float clusterTolerance, int minSize, int maxSize);
 };
 #endif /* PROCESSPOINTCLOUDS_H_ */
